@@ -40,8 +40,8 @@ using namespace std;
 #include <X11/keysym.h>
 #include <GL/glx.h>
 
-const int MAX_PARTICLES = 2000;
-const float GRAVITY = -0.1;
+const int MAX_PARTICLES = 200;
+const float GRAVITY = -0.05;
 
 //some structures
 
@@ -101,7 +101,7 @@ public:
 		if (vi == NULL) {
 			cout << "\n\tno appropriate visual found\n" << endl;
 			exit(EXIT_FAILURE);
-		} 
+		}
 		Colormap cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 		XSetWindowAttributes swa;
 		swa.colormap = cmap;
@@ -191,7 +191,7 @@ void makeParticle(int x, int y)
 	p->s.center.x = x;
 	p->s.center.y = y;
 	p->velocity.y = -4.0;
-	p->velocity.x =  1.0;
+	p->velocity.x =  1;
 	++g.n;
 }
 
@@ -259,30 +259,28 @@ void movement()
 {
 	if (g.n <= 0)
 		return;
-	for (int i = 0; i < g.n; i++) {
+	for(int i = 0; i<g.n;i++){
 		Particle *p = &g.particle[i];
 		p->s.center.x += p->velocity.x;
 		p->s.center.y += p->velocity.y;
 		p->velocity.y += GRAVITY;
 
 		//check for collision with shapes...
+		//Shape *s;
 		Shape *s = &g.box;
-		if (p->s.center.y < s->center.y + s->height &&
-			p->s.center.x > s->center.x - s->width &&
-			p->s.center.x < s->center.x - s->width) {
-			//bouce
-			p->velocity.y = -p->velocity.y;
-		}
-
-
-
+		if(p->s.center.y < s->center.y + s->height &&
+				p->s.center.y > s->center.y-s->height &&
+				p->s.center.x > s->center.x - s->width &&
+				p->s.center.x < s->center.x + s->width){
+					//bounce
+					p->velocity.y = -p->velocity.y;
+					p->velocity.y *= 0.8f;
+				}
 
 
 		//check for off-screen
 		if (p->s.center.y < 0.0) {
 			cout << "off screen" << endl;
-
-			g.particle[i] = g.particle[--g.n];
 			g.particle[i] = g.particle[--g.n];
 		}
 	}
@@ -313,15 +311,15 @@ void render()
 	//Draw the particle here
 	glPushMatrix();
 	glColor3ub(150,160,220);
-	for (int i = 0; i < g.n; i++) {
+	for(int i = 0; i < g.n; i++){
 		Vec *c = &g.particle[i].s.center;
 		w =
-			h = 2;
+		h = 2;
 		glBegin(GL_QUADS);
-		glVertex2i(c->x - w, c->y - h);
-		glVertex2i(c->x - w, c->y + h);
-		glVertex2i(c->x + w, c->y + h);
-		glVertex2i(c->x + w, c->y - h);
+		  glVertex2i(c->x-w, c->y-h);
+			glVertex2i(c->x-w, c->y+h);
+			glVertex2i(c->x+w, c->y+h);
+			glVertex2i(c->x+w, c->y-h);
 		glEnd();
 	}
 	glPopMatrix();
@@ -332,9 +330,3 @@ void render()
 
 
 }
-
-
-
-
-
-
