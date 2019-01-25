@@ -41,7 +41,7 @@ using namespace std;
 #include <GL/glx.h>
 
 const int MAX_PARTICLES = 200;
-const float GRAVITY = -0.05;
+const float GRAVITY = -0.01;
 
 //some structures
 
@@ -190,8 +190,8 @@ void makeParticle(int x, int y)
 	Particle *p = &g.particle[g.n];
 	p->s.center.x = x;
 	p->s.center.y = y;
-	p->velocity.y = -4.0;
-	p->velocity.x =  1;
+	p->velocity.y = -0.5f;
+	p->velocity.x =  0.25f;
 	++g.n;
 }
 
@@ -214,7 +214,8 @@ void check_mouse(XEvent *e)
 		if (e->xbutton.button==1) {
 			//Left button was pressed
 			int y = g.yres - e->xbutton.y;
-			makeParticle(e->xbutton.x, y);
+			for(int i = -5;i<5;i++)
+				makeParticle(e->xbutton.x+i, y);
 			return;
 		}
 		if (e->xbutton.button==3) {
@@ -275,6 +276,8 @@ void movement()
 					//bounce
 					p->velocity.y = -p->velocity.y;
 					p->velocity.y *= 0.8f;
+					//move out of collision zone
+					p->s.center.y = s->center.y + s->height;
 				}
 
 
