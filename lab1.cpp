@@ -270,15 +270,16 @@ void movement()
 		//Shape *s;
 		Shape *s = &g.box;
 		if(p->s.center.y < s->center.y + s->height &&
-				p->s.center.y > s->center.y-s->height &&
-				p->s.center.x > s->center.x - s->width &&
-				p->s.center.x < s->center.x + s->width){
-					//bounce
-					p->velocity.y = -p->velocity.y;
-					p->velocity.y *= 0.8f;
-					//move out of collision zone
-					p->s.center.y = s->center.y + s->height;
-				}
+			p->s.center.y > s->center.y-s->height &&
+			p->s.center.x > s->center.x - s->width &&
+			p->s.center.x < s->center.x + s->width){
+			
+			//bounce
+			p->velocity.y = -p->velocity.y;
+			p->velocity.y *= 0.8f;
+			//move out of collision zone
+			p->s.center.y = s->center.y + s->height;
+		}
 
 
 		//check for off-screen
