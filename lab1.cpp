@@ -1,6 +1,10 @@
 //
 //modified by:Nickolas Larson
+<<<<<<< HEAD
+//date:1/31/2019
+=======
 //date:1/25/2019
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 //
 //
 //3350 Spring 2018 Lab-1
@@ -40,9 +44,16 @@ using namespace std;
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+<<<<<<< HEAD
+#include "fonts.h"
+
+const int MAX_PARTICLES = 20000;
+const float GRAVITY = -1.0;
+=======
 
 const int MAX_PARTICLES = 200;
 const float GRAVITY = -0.1;
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 
 //some structures
 
@@ -61,21 +72,47 @@ struct Particle {
 	Vec velocity;
 };
 
+<<<<<<< HEAD
+
+class Global {
+public:
+	int xres, yres;
+	Shape box[5];
+=======
 class Global {
 public:
 	int xres, yres;
 	Shape box;
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 	Particle particle[MAX_PARTICLES];
 	int n;
 	Global() {
 		xres = 800;
 		yres = 600;
 		//define a box shape
+<<<<<<< HEAD
+		for(int i = 0 ; i < 5 ; i++){
+			box[i].width = 100;
+			box[i].height = 10;
+			box[i].center.x = 200 + 5*65-i*100;
+			box[i].center.y = 500 - 5*60+i*80;
+		}
+			n = 0;
+	}
+
+	//used to vary particle velocity slightly
+	int randomNum(){
+
+		//printf("RANDOM\n");
+		return (rand()%10);
+
+=======
 		box.width = 100;
 		box.height = 10;
 		box.center.x = 120 + 5*65;
 		box.center.y = 500 - 5*60;
 		n = 0;
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 	}
 } g;
 
@@ -143,7 +180,11 @@ void check_mouse(XEvent *e);
 int check_keys(XEvent *e);
 void movement();
 void render();
+<<<<<<< HEAD
+void makeParticle(int x, int y);
+=======
 
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 
 
 //=====================================
@@ -162,10 +203,20 @@ int main()
 			check_mouse(&e);
 			done = check_keys(&e);
 		}
+<<<<<<< HEAD
+		for(int i = 0; i<20;i++){
+			makeParticle(170+i+g.randomNum(),550+i+g.randomNum());
+		}
+=======
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 		movement();
 		render();
 		x11.swapBuffers();
 	}
+<<<<<<< HEAD
+	cleanup_fonts();
+=======
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 	return 0;
 }
 
@@ -180,10 +231,20 @@ void init_opengl(void)
 	glOrtho(0, g.xres, 0, g.yres, -1, 1);
 	//Set the screen background color
 	glClearColor(0.1, 0.1, 0.1, 1.0);
+<<<<<<< HEAD
+	glEnable(GL_TEXTURE_2D);
+	initialize_fonts();
+=======
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 }
 
 void makeParticle(int x, int y)
 {
+<<<<<<< HEAD
+
+	//170, 582 create them at
+=======
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 	if (g.n >= MAX_PARTICLES)
 		return;
 	cout << "makeParticle() " << x << " " << y << endl;
@@ -191,8 +252,13 @@ void makeParticle(int x, int y)
 	Particle *p = &g.particle[g.n];
 	p->s.center.x = x;
 	p->s.center.y = y;
+<<<<<<< HEAD
+	p->velocity.y = -0.5f;
+	p->velocity.x = 1.5f;
+=======
 	p->velocity.y = -2.0f;
 	p->velocity.x =  1.0f;
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 	++g.n;
 }
 
@@ -267,6 +333,23 @@ void movement()
 		p->velocity.y += GRAVITY;
 
 		//check for collision with shapes...
+<<<<<<< HEAD
+		Shape *s;
+		for(int i = 0; i < 5 ; i++){
+			s = &g.box[i];
+			if(p->s.center.y < s->center.y + s->height &&
+					p->s.center.y > s->center.y-s->height &&
+					p->s.center.x > s->center.x - s->width &&
+					p->s.center.x < s->center.x + s->width){
+						//bounce
+						p->velocity.y = -p->velocity.y;
+						p->velocity.y *= 0.7f;
+						//move out of collision zone
+						p->s.center.y = s->center.y + s->height;
+					}
+		}
+
+=======
 		//Shape *s;
 		Shape *s = &g.box;
 		if(p->s.center.y < s->center.y + s->height &&
@@ -282,6 +365,7 @@ void movement()
 		}
 
 
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 		//check for off-screen
 		if (p->s.center.y < 0.0) {
 			cout << "off screen" << endl;
@@ -298,6 +382,23 @@ void render()
 	//draw a box
 	Shape *s;
 	glColor3ub(90,140,90);
+<<<<<<< HEAD
+	float w, h;
+	for(int i = 0; i<5 ; i++){
+		s = &g.box[i];
+		glPushMatrix();
+		glTranslatef(s->center.x, s->center.y, s->center.z);
+		w = s->width;
+		h = s->height;
+		glBegin(GL_QUADS);
+			glVertex2i(-w, -h);
+			glVertex2i(-w,  h);
+			glVertex2i( w,  h);
+			glVertex2i( w, -h);
+		glEnd();
+		glPopMatrix();
+	}
+=======
 	s = &g.box;
 	glPushMatrix();
 	glTranslatef(s->center.x, s->center.y, s->center.z);
@@ -311,6 +412,7 @@ void render()
 		glVertex2i( w, -h);
 	glEnd();
 	glPopMatrix();
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 	//
 	//Draw the particle here
 	glPushMatrix();
@@ -327,9 +429,34 @@ void render()
 		glEnd();
 	}
 	glPopMatrix();
+<<<<<<< HEAD
+
+	//
+	//Draw your 2D text here
+	Rect r;
+	r.center = 0;
+	unsigned int c = 0x00ffff44;
+	const char * waterfallText[]= {"Requirement","Design","Implementation","Verification","Maintenance"};
+
+
+	for(int i = 0; i < 5;i++){
+		r.left = g.box[i].center.x-i*4.5-20;
+		r.bot = g.box[i].center.y-5;
+
+	  ggprint8b(&r, 16, c, waterfallText[i]);
+	}
+
+//r.left = g.box[4].center.x;
+/*
+r.left = g.box[4].center.x - 30;
+r.bot = g.box[4].center.y-5;
+ggprint8b(&r, 16, c, waterfallText[0]);
+*/
+=======
 	//
 	//Draw your 2D text here
 
+>>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 
 
 
