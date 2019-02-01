@@ -1,10 +1,10 @@
 //
 //modified by:Nickolas Larson
-<<<<<<< HEAD
+
 //date:1/31/2019
-=======
+
 //date:1/25/2019
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
+
 //
 //
 //3350 Spring 2018 Lab-1
@@ -44,16 +44,14 @@ using namespace std;
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
-<<<<<<< HEAD
+
 #include "fonts.h"
 
 const int MAX_PARTICLES = 20000;
-const float GRAVITY = -1.0;
-=======
+const float GRAVITY = -0.7;
 
-const int MAX_PARTICLES = 200;
-const float GRAVITY = -0.1;
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
+
+
 
 //some structures
 
@@ -72,106 +70,94 @@ struct Particle {
 	Vec velocity;
 };
 
-<<<<<<< HEAD
-
-class Global {
-public:
-	int xres, yres;
-	Shape box[5];
-=======
-class Global {
-public:
-	int xres, yres;
-	Shape box;
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
-	Particle particle[MAX_PARTICLES];
-	int n;
-	Global() {
-		xres = 800;
-		yres = 600;
-		//define a box shape
-<<<<<<< HEAD
-		for(int i = 0 ; i < 5 ; i++){
-			box[i].width = 100;
-			box[i].height = 10;
-			box[i].center.x = 200 + 5*65-i*100;
-			box[i].center.y = 500 - 5*60+i*80;
-		}
+class Global{
+	public:
+		int xres, yres;
+		Shape box[5];
+		Particle particle[MAX_PARTICLES];
+		int n;
+		int count = 10;
+		Global() {
+			xres = 800;
+			yres = 600;
+			//define a box shape
+			for(int i = 0 ; i < 5 ; i++){
+				box[i].width = 100;
+				box[i].height = 10;
+				box[i].center.x = 200 + 5*65-i*100;
+				box[i].center.y = 500 - 5*60+i*80;
+			}
 			n = 0;
-	}
+		}
 
-	//used to vary particle velocity slightly
-	int randomNum(){
+		//used to vary particle velocity slightly
+		int randomNum(){
 
-		//printf("RANDOM\n");
-		return (rand()%10);
+			//printf("RANDOM\n");
+			if(count>=20){
+				count = 10;
+			}
+			return (rand()%count++);
 
-=======
-		box.width = 100;
-		box.height = 10;
-		box.center.x = 120 + 5*65;
-		box.center.y = 500 - 5*60;
-		n = 0;
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
-	}
+		}
 } g;
 
 class X11_wrapper {
-private:
-	Display *dpy;
-	Window win;
-	GLXContext glc;
-public:
-	~X11_wrapper() {
-		XDestroyWindow(dpy, win);
-		XCloseDisplay(dpy);
-	}
-	X11_wrapper() {
-		GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
-		int w = g.xres, h = g.yres;
-		dpy = XOpenDisplay(NULL);
-		if (dpy == NULL) {
-			cout << "\n\tcannot connect to X server\n" << endl;
-			exit(EXIT_FAILURE);
+	private:
+		Display *dpy;
+		Window win;
+		GLXContext glc;
+	public:
+		~X11_wrapper() {
+			XDestroyWindow(dpy, win);
+			XCloseDisplay(dpy);
 		}
-		Window root = DefaultRootWindow(dpy);
-		XVisualInfo *vi = glXChooseVisual(dpy, 0, att);
-		if (vi == NULL) {
-			cout << "\n\tno appropriate visual found\n" << endl;
-			exit(EXIT_FAILURE);
+		X11_wrapper() {
+			GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
+			int w = g.xres, h = g.yres;
+			dpy = XOpenDisplay(NULL);
+			if (dpy == NULL) {
+				cout << "\n\tcannot connect to X server\n" << endl;
+				exit(EXIT_FAILURE);
+			}
+			Window root = DefaultRootWindow(dpy);
+			XVisualInfo *vi = glXChooseVisual(dpy, 0, att);
+			if (vi == NULL) {
+				cout << "\n\tno appropriate visual found\n" << endl;
+				exit(EXIT_FAILURE);
+			}
+			Colormap cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
+			XSetWindowAttributes swa;
+			swa.colormap = cmap;
+			swa.event_mask =
+				ExposureMask | KeyPressMask | KeyReleaseMask |
+				ButtonPress | ButtonReleaseMask |
+				PointerMotionMask |
+				StructureNotifyMask | SubstructureNotifyMask;
+			win = XCreateWindow(dpy, root, 0, 0, w, h, 0, vi->depth,
+					InputOutput, vi->visual, CWColormap | CWEventMask, &swa);
+			set_title();
+			glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
+			glXMakeCurrent(dpy, win, glc);
 		}
-		Colormap cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
-		XSetWindowAttributes swa;
-		swa.colormap = cmap;
-		swa.event_mask =
-			ExposureMask | KeyPressMask | KeyReleaseMask |
-			ButtonPress | ButtonReleaseMask |
-			PointerMotionMask |
-			StructureNotifyMask | SubstructureNotifyMask;
-		win = XCreateWindow(dpy, root, 0, 0, w, h, 0, vi->depth,
-			InputOutput, vi->visual, CWColormap | CWEventMask, &swa);
-		set_title();
-		glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
-		glXMakeCurrent(dpy, win, glc);
-	}
-	void set_title() {
-		//Set the window title bar.
-		XMapWindow(dpy, win);
-		XStoreName(dpy, win, "3350 Lab1");
-	}
-	bool getXPending() {
-		//See if there are pending events.
-		return XPending(dpy);
-	}
-	XEvent getXNextEvent() {
-		//Get a pending event.
-		XEvent e;
-		XNextEvent(dpy, &e);
-		return e;
-	}
-	void swapBuffers() {
-		glXSwapBuffers(dpy, win);
-	}
+		void set_title() {
+			//Set the window title bar.
+			XMapWindow(dpy, win);
+			XStoreName(dpy, win, "3350 Lab1");
+		}
+		bool getXPending() {
+			//See if there are pending events.
+			return XPending(dpy);
+		}
+		XEvent getXNextEvent() {
+			//Get a pending event.
+			XEvent e;
+			XNextEvent(dpy, &e);
+			return e;
+		}
+		void swapBuffers() {
+			glXSwapBuffers(dpy, win);
+		}
 } x11;
 
 //Function prototypes
@@ -180,11 +166,8 @@ void check_mouse(XEvent *e);
 int check_keys(XEvent *e);
 void movement();
 void render();
-<<<<<<< HEAD
 void makeParticle(int x, int y);
-=======
 
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 
 
 //=====================================
@@ -203,20 +186,14 @@ int main()
 			check_mouse(&e);
 			done = check_keys(&e);
 		}
-<<<<<<< HEAD
 		for(int i = 0; i<20;i++){
-			makeParticle(170+i+g.randomNum(),550+i+g.randomNum());
+			makeParticle(170+i+g.randomNum(),580+i+g.randomNum());
 		}
-=======
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 		movement();
 		render();
 		x11.swapBuffers();
 	}
-<<<<<<< HEAD
 	cleanup_fonts();
-=======
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 	return 0;
 }
 
@@ -231,20 +208,14 @@ void init_opengl(void)
 	glOrtho(0, g.xres, 0, g.yres, -1, 1);
 	//Set the screen background color
 	glClearColor(0.1, 0.1, 0.1, 1.0);
-<<<<<<< HEAD
 	glEnable(GL_TEXTURE_2D);
 	initialize_fonts();
-=======
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 }
 
 void makeParticle(int x, int y)
 {
-<<<<<<< HEAD
 
 	//170, 582 create them at
-=======
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 	if (g.n >= MAX_PARTICLES)
 		return;
 	cout << "makeParticle() " << x << " " << y << endl;
@@ -252,13 +223,8 @@ void makeParticle(int x, int y)
 	Particle *p = &g.particle[g.n];
 	p->s.center.x = x;
 	p->s.center.y = y;
-<<<<<<< HEAD
-	p->velocity.y = -0.5f;
-	p->velocity.x = 1.5f;
-=======
-	p->velocity.y = -2.0f;
-	p->velocity.x =  1.0f;
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
+	p->velocity.y = -0.8f+(g.randomNum()/30);
+	p->velocity.x = 0.6f+(g.randomNum()/18);
 	++g.n;
 }
 
@@ -268,8 +234,8 @@ void check_mouse(XEvent *e)
 	static int savey = 0;
 
 	if (e->type != ButtonRelease &&
-		e->type != ButtonPress &&
-		e->type != MotionNotify) {
+			e->type != ButtonPress &&
+			e->type != MotionNotify) {
 		//This is not a mouse event that we care about.
 		return;
 	}
@@ -333,39 +299,24 @@ void movement()
 		p->velocity.y += GRAVITY;
 
 		//check for collision with shapes...
-<<<<<<< HEAD
+		//Shape *s;
 		Shape *s;
-		for(int i = 0; i < 5 ; i++){
+		for(int i = 0; i< 5; i++){
 			s = &g.box[i];
 			if(p->s.center.y < s->center.y + s->height &&
 					p->s.center.y > s->center.y-s->height &&
 					p->s.center.x > s->center.x - s->width &&
 					p->s.center.x < s->center.x + s->width){
-						//bounce
-						p->velocity.y = -p->velocity.y;
-						p->velocity.y *= 0.7f;
-						//move out of collision zone
-						p->s.center.y = s->center.y + s->height;
-					}
-		}
 
-=======
-		//Shape *s;
-		Shape *s = &g.box;
-		if(p->s.center.y < s->center.y + s->height &&
-			p->s.center.y > s->center.y-s->height &&
-			p->s.center.x > s->center.x - s->width &&
-			p->s.center.x < s->center.x + s->width){
-			
-			//bounce
-			p->velocity.y = -p->velocity.y;
-			p->velocity.y *= 0.8f;
-			//move out of collision zone
-			p->s.center.y = s->center.y + s->height;
+				//bounce
+				p->velocity.y = -p->velocity.y;
+				p->velocity.y *= 0.7;
+				//move out of collision zone
+				p->s.center.y = s->center.y + s->height;
+			}
 		}
 
 
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 		//check for off-screen
 		if (p->s.center.y < 0.0) {
 			cout << "off screen" << endl;
@@ -382,7 +333,6 @@ void render()
 	//draw a box
 	Shape *s;
 	glColor3ub(90,140,90);
-<<<<<<< HEAD
 	float w, h;
 	for(int i = 0; i<5 ; i++){
 		s = &g.box[i];
@@ -391,72 +341,44 @@ void render()
 		w = s->width;
 		h = s->height;
 		glBegin(GL_QUADS);
-			glVertex2i(-w, -h);
-			glVertex2i(-w,  h);
-			glVertex2i( w,  h);
-			glVertex2i( w, -h);
-		glEnd();
-		glPopMatrix();
-	}
-=======
-	s = &g.box;
-	glPushMatrix();
-	glTranslatef(s->center.x, s->center.y, s->center.z);
-	float w, h;
-	w = s->width;
-	h = s->height;
-	glBegin(GL_QUADS);
 		glVertex2i(-w, -h);
 		glVertex2i(-w,  h);
 		glVertex2i( w,  h);
 		glVertex2i( w, -h);
-	glEnd();
-	glPopMatrix();
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
-	//
+		glEnd();
+		glPopMatrix();
+	}
 	//Draw the particle here
 	glPushMatrix();
 	glColor3ub(150,160,220);
 	for(int i = 0; i < g.n; i++){
 		Vec *c = &g.particle[i].s.center;
 		w =
-		h = 2;
+			h = 2;
 		glBegin(GL_QUADS);
-		  glVertex2i(c->x-w, c->y-h);
-			glVertex2i(c->x-w, c->y+h);
-			glVertex2i(c->x+w, c->y+h);
-			glVertex2i(c->x+w, c->y-h);
+		glVertex2i(c->x-w, c->y-h);
+		glVertex2i(c->x-w, c->y+h);
+		glVertex2i(c->x+w, c->y+h);
+		glVertex2i(c->x+w, c->y-h);
 		glEnd();
 	}
 	glPopMatrix();
-<<<<<<< HEAD
 
 	//
 	//Draw your 2D text here
 	Rect r;
 	r.center = 0;
 	unsigned int c = 0x00ffff44;
-	const char * waterfallText[]= {"Requirement","Design","Implementation","Verification","Maintenance"};
-
-
+	const char * waterfallText[]= {"Maintenance", "Verification","Implementation","Design","Requirement"};
+	
 	for(int i = 0; i < 5;i++){
 		r.left = g.box[i].center.x-i*4.5-20;
 		r.bot = g.box[i].center.y-5;
 
-	  ggprint8b(&r, 16, c, waterfallText[i]);
+		ggprint8b(&r, 16, c, waterfallText[i]);
 	}
 
-//r.left = g.box[4].center.x;
-/*
-r.left = g.box[4].center.x - 30;
-r.bot = g.box[4].center.y-5;
-ggprint8b(&r, 16, c, waterfallText[0]);
-*/
-=======
-	//
-	//Draw your 2D text here
 
->>>>>>> 0ac4dcce745ae469c501fa6d2ccbb66796687e62
 
 
 
