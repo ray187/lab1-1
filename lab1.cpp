@@ -2,9 +2,6 @@
 //modified by:Nickolas Larson
 
 //date:1/31/2019
-
-//date:1/25/2019
-
 //
 //
 //3350 Spring 2018 Lab-1
